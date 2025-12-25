@@ -55,33 +55,138 @@ Convert to File (Workflow Template)
 ```
 ---
 
-🧩 Sub-Processes
-🔹 Sub-Process #1: Web Crawler (Firecrawl)
+## 🧩 Sub-Processes :
 
-Purpose: Collect n8n documentation
+🔹 Sub-Process #1: Web Crawler (Documentation Ingestion)
 
-Steps:
+Purpose:
+Crawl and collect n8n documentation for RAG training.
 
-1) HTTP Request → Firecrawl Extract
-2) Wait & poll results
-3) Retry logic
-4) Output raw documentation
+Manual Trigger
+   ↓
+Set URL (docs.n8n.io)
+   ↓
+HTTP Request (Firecrawl Extract)
+   ↓
+Wait (30s)
+   ↓
+Get Results
+   ↓
+IF (Completed?)
+   ├─ YES → Output Docs
+   └─ NO  → Wait (10s) → Retry
 
 ---
 
 🔹 Sub-Process #2: RAG Trainer
 
-Purpose: Train vector database for retrieval
+Purpose:
+Convert documentation into embeddings and store them in Pinecone.
 
-Steps:
+Documentation Input
+   ↓
+Default Data Loader
+   ↓
+Recursive Character Text Splitter
+   ↓
+OpenAI Embeddings
+   ↓
+Train Pinecone Vector Store
 
-1) Default Data Loader
+---
 
-2) Recursive Character Text Splitter
 
-3) OpenAI Embeddings
+🔹 Sub-Process #3: AI Workflow Builder (Main Engine)
 
-4) Pinecone Vector Store (upsert)
+Purpose:
+Generate complete n8n workflows automatically.
 
-5) Run once or whenever documentation changes.
+Chat Trigger
+   ↓
+Set Preferences
+   ├─ Chat Model
+   ├─ Vector DB
+   ├─ Embeddings
+   └─ Web Search Tool
+   ↓
+AI Agent (LangChain)
+ ├─ GPT-4o (reasoning)
+ ├─ Pinecone (context retrieval)
+ └─ SerpAPI (web research)
+   ↓
+OpenAI Validator (JSON validation)
+   ↓
+Code Node (Extract JSON)
+   ↓
+Convert to JSON File
+
+---
+
+⚙️ Key Nodes Used
+
+* @n8n/n8n-nodes-langchain.chatTrigger
+
+* @n8n/n8n-nodes-langchain.agent
+
+* @n8n/n8n-nodes-langchain.lmChatOpenRouter
+
+* @n8n/n8n-nodes-langchain.embeddingsOpenAi
+
+* Pinecone Vector Store
+
+* SerpAPI Tool
+
+* Code (JSON extraction)
+
+* Convert to File
+
+---
+
+## 🔐 Required Credentials
+
+| Service    | Used For                     |
+| ---------- | ---------------------------- |
+| OpenRouter | GPT-4o chat model            |
+| OpenAI     | Embeddings & JSON validation |
+| Pinecone   | Vector database (RAG)        |
+| SerpAPI    | Web search                   |
+| Firecrawl  | Documentation crawling       |
+
+---
+
+## 🧪 How to Run the System
+
+1️⃣ Import Workflow
+
+*n8n → Workflows → Import
+*Upload the .json file
+
+2️⃣ Configure Credentials
+
+* Attach credentials to:
+   -                   OpenRouter Chat Model
+                       OpenAI Embeddings
+                       Pinecone Vector Store
+                       SerpAPI
+                       Firecrawl (HTTP Header Auth)
+
+3️⃣ Train RAG (One-Time)
+
+*Run Web Crawler
+*Execute RAG Trainer
+*Verify Pinecone index
+
+4️⃣ Generate Workflows
+
+*Trigger Chat Trigger
+*Example prompt: "Build an n8n workflow that classifies incoming Gmail emails using AI"
+*Download generated workflow JSON
+
+---
+
+
+
+
+
+
    

@@ -51,3 +51,37 @@ OpenAI Validator (JSON Check)
 Code Node (Extract JSON)
       ↓
 Convert to File (Workflow Template)
+
+```
+---
+
+🧩 Sub-Processes
+🔹 Sub-Process #1: Web Crawler (Firecrawl)
+
+Purpose: Collect n8n documentation
+
+Steps:
+
+1) HTTP Request → Firecrawl Extract
+2) Wait & poll results
+3) Retry logic
+4) Output raw documentation
+
+---
+
+🔹 Sub-Process #2: RAG Trainer
+
+Purpose: Train vector database for retrieval
+
+Steps:
+
+1) Default Data Loader
+
+2) Recursive Character Text Splitter
+
+3) OpenAI Embeddings
+
+4) Pinecone Vector Store (upsert)
+
+5) Run once or whenever documentation changes.
+   
